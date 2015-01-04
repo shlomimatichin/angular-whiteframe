@@ -18,11 +18,15 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
         return {
             restrict: 'A',
             scope: {
-                depthText: "@whiteframezheight",
+                depthText: "@whiteframeZheight",
+                paddingText: "@whiteframePadding",
+                heightMultiplierText: "@whiteframeHeightMultiplier",
             },
             link: function (scope, element, attrs, ngModelCtrl) {
                 scope.open = false;
                 scope.depth = parseInt(scope.depthText);
+                scope.padding = parseInt(scope.paddingText);
+                scope.heightMultiplier = parseInt(scope.heightMultiplierText);
                 $(element).children().hide();
                 var closedRoot = $(element).children()[0];
                 var openedRoot = $(element).children()[1];
@@ -36,20 +40,27 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                         var zHeight = zHeights[scope.depth];
                         openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,0)';
                         openedRoot.style['box-shadow-opacity'] = 0;
+                        var width = $(closedRoot).width();
+                        var height = $(closedRoot).height();
                         $(openedRoot).animate({
                             'box-shadow-opacity': zHeight.boxShadowOpacity}, {
                             duration: 200,
                             step: function( now, fx ) {
                                 openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + now + ')';
-                            }
-                        }).animate({
-                            width: +230,
-                            left: -15,
-                            height: 95,
-                            top: -57,
-                            'padding-top': 38,
-                            'padding-left': 15,
-                        },300);
+                            },
+                            complete: function() {
+                                openedRoot.style['-webkit-transition'] = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-top 0.3s, padding-left 0.3s';
+                                openedRoot.style.transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-top 0.3s, padding-left 0.3s';
+                                openedRoot.style.width = '' + (width + 2*scope.padding) + 'px';
+                                openedRoot.style.left = '-' + scope.padding + 'px';
+                                openedRoot.style.height = '' + (scope.heightMultiplier * height) + 'px';
+console.log('' + (scope.heightMultiplier * height) + 'px');
+                                openedRoot.style.top = '-' + ((scope.heightMultiplier * height + 1)/2) + 'px';
+//                                openedRoot.style['padding-top'] = '' + (scope.heightMultiplier * height / 2) + 'px';
+                                openedRoot.style['padding-left'] = '' + scope.padding + 'px';
+console.log('done');
+                            },
+                        });
                     } else {
                     }
                 });
