@@ -4,8 +4,8 @@ var CSSTransitionEditor = function(previousValue) {
 
     if (previousValue) {
         var parts = previousValue.split(",");
-        for (var part in parts) {
-            var stripped = part.replace(/^\s+|\s+$/g, '');
+        for (var partIndex in parts) {
+            var stripped = parts[partIndex].replace(/^\s+|\s+$/g, '');
             var fields = stripped.split(/\s+/);
             if (fields.length != 2)
                 continue;
@@ -24,6 +24,13 @@ var CSSTransitionEditor = function(previousValue) {
         for (var field in self._map)
             result.push(field + " " + self._map[field]);
         return result.join(", ");
+    }
+    self.apply = function(element) {
+        var serialized = self.serialize();
+        element.style['-os-transition'] = serialized;
+        element.style['-moz-transition'] = serialized;
+        element.style['-webkit-transition'] = serialized;
+        element.style.transition = serialized;
     }
 };
 
@@ -46,15 +53,11 @@ var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop) {
     editor.set('height', '0.3s');
     editor.set('left', '0.3s');
     editor.set('top', '0.3s');
-    var transition = editor.serialize();
-    element.style['-os-transition'] = transition;
-    element.style['-moz-transition'] = transition;
-    element.style['-webkit-transition'] = transition;
-    element.style.transition = transition;
-    element.style.width = '' + toWidth + 'px';
-    element.style.height = '' + toHeight + 'px';
-    element.style.left = '' + toLeft + 'px';
-    element.style.top = '' + toTop + 'px';
+    editor.apply(element);
+    element.style.width = toWidth + 'px';
+    element.style.height = toHeight + 'px';
+    element.style.left = toLeft + 'px';
+    element.style.top = toTop + 'px';
 };
 
 app.directive('whiteframeOver', ['$compile', '$q', '$parse',
@@ -67,6 +70,7 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                 depthText: "@whiteframeZheight",
                 paddingText: "@whiteframePadding",
                 heightMultiplierText: "@whiteframeHeightMultiplier",
+                growTransitionBegun: "=whiteframeGrowTransitionBegun",
             },
             link: function (scope, element, attrs, ngModelCtrl) {
                 scope.$parent.whiteframe = scope;
@@ -103,6 +107,8 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                                 scope.heightMultiplier * height,
                                 -scope.padding,
                                 -(scope.heightMultiplier * height + 1) / 2);
+                            if (scope.growTransitionBegun)
+                                scope.growTransitionBegun('0.3s', openedRoot);
                         });
                     } else {
                         var offset = $(closedRoot).offset();
@@ -136,7 +142,8 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '<div style="height: 50px; background-color: #fff; display:block;" ' +
                     'whiteframe-over whiteframe-zheight="{{zheight}}" ' +
                     'whiteframe-padding=15 ' +
-                    'whiteframe-height-multiplier="{{heightMultiplier}}">' +
+                    'whiteframe-height-multiplier="{{heightMultiplier}}" ' +
+                    'whiteframe-grow-transition-begun="growTransition">' +
                 '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
                 '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
                 '        ng-click="openMenu()">' +
@@ -168,7 +175,13 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                             optionIndex = i;
                             break;
                         }
-                    $scope.whiteframe.open(40 * optionIndex);
+                    $scope.whiteframe.open(40 * optionIndex + 5);
+                };
+                $scope.growTransition = function(intervalDesc, element) {
+                    var editor = new CSSTransitionEditor(element.style.transition);
+                    editor.set('padding-left', intervalDesc);
+                    editor.apply(element);
+                    element.style['padding-left'] = 15 + 'px';
                 };
             },
             link: function (scope, element, attrs, ngModelCtrl) {
