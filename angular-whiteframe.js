@@ -94,21 +94,13 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                         var height = $(closedRoot).height();
                         var zHeight = zHeights[scope.depth];
                         $(openedRoot).show().offset(offset).width(width).height(height);
-                        openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,0)';
-                        openedRoot.style['box-shadow-opacity'] = 0;
-                        $(openedRoot).animate({
-                            'box-shadow-opacity': zHeight.boxShadowOpacity}, {
-                            duration: 200,
-                            step: function( now, fx ) {
-                                openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + now + ')';
-                            },
-                            complete: function() {
-                                growCSSTransition(openedRoot,
-                                    width + 2*scope.padding,
-                                    scope.heightMultiplier * height,
-                                    -scope.padding,
-                                    -(scope.heightMultiplier * height + 1) / 2);
-                            },
+                        openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + zHeight.boxShadowOpacity + ')';
+                        $(openedRoot).hide().fadeIn(200, function() {
+                            growCSSTransition(openedRoot,
+                                width + 2*scope.padding,
+                                scope.heightMultiplier * height,
+                                -scope.padding,
+                                -(scope.heightMultiplier * height + 1) / 2);
                         });
                     } else {
                         var offset = $(closedRoot).offset();
