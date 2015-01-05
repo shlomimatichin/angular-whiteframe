@@ -69,15 +69,15 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                 heightMultiplierText: "@whiteframeHeightMultiplier",
             },
             link: function (scope, element, attrs, ngModelCtrl) {
+                scope.$parent.whiteframe = scope;
                 scope.isOpen = false;
-                scope.open = function() {
+                scope.open = function(scrollTopOnOpen) {
+                    scope.scrollTopOnOpen = scrollTopOnOpen;
                     scope.isOpen = true;
                 };
-                scope.$parent.openWhiteframe = scope.open;
                 scope.close = function() {
                     scope.isOpen = false;
                 };
-                scope.$parent.closeWhiteframe = scope.close;
                 scope.depth = parseInt(scope.depthText);
                 scope.padding = parseInt(scope.paddingText);
                 scope.heightMultiplier = parseInt(scope.heightMultiplierText);
@@ -95,6 +95,8 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                         var zHeight = zHeights[scope.depth];
                         $(openedRoot).show().offset(offset).width(width).height(height);
                         openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + zHeight.boxShadowOpacity + ')';
+                        if (scope.scrollTopOnOpen !== undefined)
+                            openedRoot.scrollTop = scope.scrollTopOnOpen;
                         $(openedRoot).hide().fadeIn(200, function() {
                             growCSSTransition(openedRoot,
                                 width + 2*scope.padding,
@@ -137,7 +139,7 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                     'whiteframe-height-multiplier="{{heightMultiplier}}">' +
                 '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
                 '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
-                '        ng-click="openWhiteframe()">' +
+                '        ng-click="openMenu()">' +
                 '        <span ng-bind="showingLabel"></span>' +
                 '        <div style="position: relative; left:100%; top:-23px">' +
                 '            <div style="position: relative; left:-16px;">' +
@@ -145,8 +147,10 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '            </div>'+
                 '        </div>'+
                 '    </div>' +
-                '    <div style="line-height:26px; background-color:#fff; display:block;" ng-click="closeWhiteframe()">' +
-                '        Click me!' +
+                '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" ng-click="closeWhiteframe()">' +
+                '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px;">' +
+                '            <span ng-bind="option.label"></span>' +
+                '        </div>' +
                 '    </div>' +
                 '</div></div>',
             controller: function($scope, $element) {
@@ -157,6 +161,18 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 $scope.showingLabel = "";
                 if ($scope.selected)
                     $scope.showingLabel = $scope.selected.label;
+                $scope.openMenu = function() {
+                    var optionIndex = -1;
+                    for (var i in $scope.options)
+                        if ($scope.selected == $scope.options[i]) {
+                            optionIndex = i;
+                            break;
+                        }
+                    $scope.whiteframe.open(40 * optionIndex);
+                };
+            },
+            link: function (scope, element, attrs, ngModelCtrl) {
+                scope.optionsParent = $($(element).children()[0]).children()[1];
             },
         };
     }
