@@ -11,6 +11,19 @@ var zHeights = [
     { boxShadow: '0px 27px 24px 0', boxShadowOpacity: 0.2 },
 ];
 
+var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop, toPaddingLeft) {
+    var transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-left 0.3s';
+    element.style['-os-transition'] = transition;
+    element.style['-moz-transition'] = transition;
+    element.style['-webkit-transition'] = transition;
+    element.style.transition = transition;
+    element.style.width = '' + toWidth + 'px';
+    element.style.height = '' + toHeight + 'px';
+    element.style.left = '' + toLeft + 'px';
+    element.style.top = '' + toTop + 'px';
+    element.style['padding-left'] = '' + toPaddingLeft + 'px';
+};
+
 app.directive('whiteframeOver', ['$compile', '$q', '$parse',
     function ($compile, $q, $parse) {
         'use strict';
@@ -44,12 +57,12 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                         return;
                     if (value === true) {
                         var offset = $(closedRoot).offset();
-                        $(openedRoot).show().offset(offset).width($(openedRoot).width()).height($(openedRoot).height());
-                        var zHeight = zHeights[scope.depth];
-                        openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,0)';
-                        openedRoot.style['box-shadow-opacity'] = 0;
                         var width = $(closedRoot).width();
                         var height = $(closedRoot).height();
+                        var zHeight = zHeights[scope.depth];
+                        $(openedRoot).show().offset(offset).width(width).height(height);
+                        openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,0)';
+                        openedRoot.style['box-shadow-opacity'] = 0;
                         $(openedRoot).animate({
                             'box-shadow-opacity': zHeight.boxShadowOpacity}, {
                             duration: 200,
@@ -57,13 +70,12 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                                 openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + now + ')';
                             },
                             complete: function() {
-                                openedRoot.style['-webkit-transition'] = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-left 0.3s';
-                                openedRoot.style.transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-top 0.3s, padding-left 0.3s';
-                                openedRoot.style.width = '' + (width + 2*scope.padding) + 'px';
-                                openedRoot.style.left = '-' + scope.padding + 'px';
-                                openedRoot.style.height = '' + (scope.heightMultiplier * height) + 'px';
-                                openedRoot.style.top = '-' + ((scope.heightMultiplier * height + 1)/2) + 'px';
-                                openedRoot.style['padding-left'] = '' + scope.padding + 'px';
+                                growCSSTransition(openedRoot,
+                                    width + 2*scope.padding,
+                                    scope.heightMultiplier * height,
+                                    -scope.padding,
+                                    -(scope.heightMultiplier * height + 1) / 2,
+                                    scope.padding);
                             },
                         });
                     } else {
