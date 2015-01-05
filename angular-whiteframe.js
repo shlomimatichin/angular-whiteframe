@@ -23,7 +23,15 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                 heightMultiplierText: "@whiteframeHeightMultiplier",
             },
             link: function (scope, element, attrs, ngModelCtrl) {
-                scope.open = false;
+                scope.isOpen = false;
+                scope.open = function() {
+                    scope.isOpen = true;
+                };
+                scope.$parent.openWhiteframe = scope.open;
+                scope.close = function() {
+                    scope.isOpen = false;
+                };
+                scope.$parent.closeWhiteframe = scope.close;
                 scope.depth = parseInt(scope.depthText);
                 scope.padding = parseInt(scope.paddingText);
                 scope.heightMultiplier = parseInt(scope.heightMultiplierText);
@@ -31,7 +39,7 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                 var closedRoot = $(element).children()[0];
                 var openedRoot = $(element).children()[1];
                 $(closedRoot).show();
-                scope.$watch('open', function(value, prev) {
+                scope.$watch('isOpen', function(value, prev) {
                     if (value === prev)
                         return;
                     if (value === true) {
@@ -54,18 +62,13 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                                 openedRoot.style.width = '' + (width + 2*scope.padding) + 'px';
                                 openedRoot.style.left = '-' + scope.padding + 'px';
                                 openedRoot.style.height = '' + (scope.heightMultiplier * height) + 'px';
-console.log('' + (scope.heightMultiplier * height) + 'px');
                                 openedRoot.style.top = '-' + ((scope.heightMultiplier * height + 1)/2) + 'px';
                                 openedRoot.style['padding-left'] = '' + scope.padding + 'px';
-console.log('done');
                             },
                         });
                     } else {
+console.log('here');
                     }
-                });
-                $(element).click(function() {
-                    scope.open = true;
-                    scope.$digest();
                 });
             }
         }
