@@ -124,4 +124,50 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
     }
 ]);
 
+app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
+    function ($compile, $q, $parse) {
+        'use strict';
+
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                zheight: "@whiteframeZheight",
+                heightMultiplier: "@whiteframeHeightMultiplier",
+                options: "=whiteframeMenuOptions",
+                selected: "=whiteframeMenuSelected",
+            },
+            template:
+                '<div>' +
+                '<div style="height: 50px; background-color: #fff; display:block;" ' +
+                    'whiteframe-over whiteframe-zheight="{{zheight}}" ' +
+                    'whiteframe-padding=15 ' +
+                    'whiteframe-height-multiplier="{{heightMultiplier}}">' +
+                '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
+                '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
+                '        ng-click="openWhiteframe()">' +
+                '        <span ng-bind="showingLabel"></span>' +
+                '        <div style="position: relative; left:100%; top:-23px">' +
+                '            <div style="position: relative; left:-16px;">' +
+                '                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M5 8l4 4 4-4z"/></svg>' +
+                '            </div>'+
+                '        </div>'+
+                '    </div>' +
+                '    <div style="line-height:26px; background-color:#fff; display:block;" ng-click="closeWhiteframe()">' +
+                '        Click me!' +
+                '    </div>' +
+                '</div></div>',
+            link: function (scope, element, attrs, ngModelCtrl) {
+                if (!scope.zheight)
+                    scope.zheight = 1;
+                if (!scope.heightMultiplier)
+                    scope.heightMultiplier = 5;
+                scope.showingLabel = "";
+                if (scope.selected)
+                    scope.showingLabel = scope.selected.label;
+            },
+        };
+    }
+]);
+
 })();

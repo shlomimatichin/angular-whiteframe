@@ -33,10 +33,37 @@
                     Click me!
                 </div>
             </div>
+            <div style="display: block; height:150px;">
+            </div>
+            <div>
+                <menu-demo></menu-demo>
+            </div>
         </div>
 
     <script>
         var app = angular.module('demoApp', ['whiteframe']);
+        app.directive("menuDemo", function() {
+            return {
+                restrict: "E",
+                template:
+                    '<whiteframe-menu whiteframe-menu-options="options" whiteframe-menu-selected="selected" style="width:200px" whiteframe-zheight=1 whiteframe-height-multiplier=5>' +
+                    '</whiteframe-menu>',
+                scope: {},
+                controller: function($scope, $element) {
+                    $scope.options = [
+                        {key: 1, label: "Option 1"},
+                        {key: 2, label: "Option 2"},
+                        {key: 3, label: "Option 3"},
+                        {key: 4, label: "Option 4"},
+                        {key: 5, label: "Option 5"},
+                        {key: 6, label: "Option 6"},
+                        {key: 7, label: "Option 7"},
+                        {key: 8, label: "Option 8"},
+                    ];
+                    $scope.selected = $scope.options[5];
+                },
+            };
+        });
     </script>
     </body>
 </html>
