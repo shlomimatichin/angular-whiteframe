@@ -1,3 +1,32 @@
+var CSSTransitionEditor = function(previousValue) {
+    var self = this;
+    self._map = {};
+
+    if (previousValue) {
+        var parts = previousValue.split(",");
+        for (var part in parts) {
+            var stripped = part.replace(/^\s+|\s+$/g, '');
+            var fields = stripped.split(/\s+/);
+            if (fields.length != 2)
+                continue;
+            self._map[fields[0]] = fields[1];
+        }
+    }
+
+    self.set = function(field, value) {
+        self._map[field] = value;
+    }
+    self.unset = function(field) {
+        delete self._map[field];
+    }
+    self.serialize = function() {
+        result = [];
+        for (var field in self._map)
+            result.push(field + " " + self._map[field]);
+        return result.join(", ");
+    }
+};
+
 (function() {
 
 var app = angular.module('whiteframe', []);
@@ -12,7 +41,12 @@ var zHeights = [
 ];
 
 var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop) {
-    var transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s';
+    var editor = new CSSTransitionEditor(element.style.transition);
+    editor.set('width', '0.3s');
+    editor.set('height', '0.3s');
+    editor.set('left', '0.3s');
+    editor.set('top', '0.3s');
+    var transition = editor.serialize();
     element.style['-os-transition'] = transition;
     element.style['-moz-transition'] = transition;
     element.style['-webkit-transition'] = transition;
