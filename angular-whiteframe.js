@@ -49,14 +49,13 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                                 openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + now + ')';
                             },
                             complete: function() {
-                                openedRoot.style['-webkit-transition'] = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-top 0.3s, padding-left 0.3s';
+                                openedRoot.style['-webkit-transition'] = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-left 0.3s';
                                 openedRoot.style.transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-top 0.3s, padding-left 0.3s';
                                 openedRoot.style.width = '' + (width + 2*scope.padding) + 'px';
                                 openedRoot.style.left = '-' + scope.padding + 'px';
                                 openedRoot.style.height = '' + (scope.heightMultiplier * height) + 'px';
 console.log('' + (scope.heightMultiplier * height) + 'px');
                                 openedRoot.style.top = '-' + ((scope.heightMultiplier * height + 1)/2) + 'px';
-//                                openedRoot.style['padding-top'] = '' + (scope.heightMultiplier * height / 2) + 'px';
                                 openedRoot.style['padding-left'] = '' + scope.padding + 'px';
 console.log('done');
                             },
