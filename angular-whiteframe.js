@@ -11,8 +11,8 @@ var zHeights = [
     { boxShadow: '0px 27px 24px 0', boxShadowOpacity: 0.2 },
 ];
 
-var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop, toPaddingLeft) {
-    var transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s, padding-left 0.3s';
+var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop) {
+    var transition = 'width 0.3s, left 0.3s, height 0.3s, top 0.3s';
     element.style['-os-transition'] = transition;
     element.style['-moz-transition'] = transition;
     element.style['-webkit-transition'] = transition;
@@ -21,7 +21,6 @@ var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop, toPa
     element.style.height = '' + toHeight + 'px';
     element.style.left = '' + toLeft + 'px';
     element.style.top = '' + toTop + 'px';
-    element.style['padding-left'] = '' + toPaddingLeft + 'px';
 };
 
 app.directive('whiteframeOver', ['$compile', '$q', '$parse',
@@ -74,12 +73,16 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                                     width + 2*scope.padding,
                                     scope.heightMultiplier * height,
                                     -scope.padding,
-                                    -(scope.heightMultiplier * height + 1) / 2,
-                                    scope.padding);
+                                    -(scope.heightMultiplier * height + 1) / 2);
                             },
                         });
                     } else {
-console.log('here');
+                        var offset = $(closedRoot).offset();
+                        var width = $(closedRoot).width();
+                        var height = $(closedRoot).height();
+                        $(openedRoot).fadeOut(200, function(){
+                            $(openedRoot).show().offset(offset).width(width).height(height).hide();
+                        });
                     }
                 });
             }
