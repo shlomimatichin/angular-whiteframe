@@ -71,6 +71,7 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                 paddingText: "@whiteframePadding",
                 heightMultiplierText: "@whiteframeHeightMultiplier",
                 growTransitionBegun: "=whiteframeGrowTransitionBegun",
+                growTransitionReset: "=whiteframeGrowTransitionReset",
             },
             link: function (scope, element, attrs, ngModelCtrl) {
                 scope.$parent.whiteframe = scope;
@@ -115,7 +116,10 @@ app.directive('whiteframeOver', ['$compile', '$q', '$parse',
                         var width = $(closedRoot).width();
                         var height = $(closedRoot).height();
                         $(openedRoot).fadeOut(200, function(){
-                            $(openedRoot).show().offset(offset).width(width).height(height).hide();
+                            $(openedRoot).show().offset(offset).width(width).height(height);
+                            if (scope.growTransitionReset)
+                                scope.growTransitionReset(openedRoot);
+                            $(openedRoot).hide();
                         });
                     }
                 });
@@ -143,7 +147,8 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                     'whiteframe-over whiteframe-zheight="{{zheight}}" ' +
                     'whiteframe-padding=15 ' +
                     'whiteframe-height-multiplier="{{heightMultiplier}}" ' +
-                    'whiteframe-grow-transition-begun="growTransition">' +
+                    'whiteframe-grow-transition-begun="growTransition" ' +
+                    'whiteframe-grow-transition-reset="growTransitionReset">' +
                 '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
                 '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
                 '        ng-click="openMenu()">' +
@@ -155,7 +160,7 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '        </div>'+
                 '    </div>' +
                 '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" ng-click="closeWhiteframe()">' +
-                '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px;">' +
+                '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px; cursor:pointer; " ng-click="selectionMade(option)">' +
                 '            <span ng-bind="option.label"></span>' +
                 '        </div>' +
                 '    </div>' +
@@ -177,15 +182,20 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                         }
                     $scope.whiteframe.open(40 * optionIndex + 5);
                 };
+                $scope.selectionMade = function(option) {
+                    $scope.selected = option;
+                    $scope.showingLabel = option.label;
+                    $scope.whiteframe.close();
+                };
                 $scope.growTransition = function(intervalDesc, element) {
                     var editor = new CSSTransitionEditor(element.style.transition);
                     editor.set('padding-left', intervalDesc);
                     editor.apply(element);
                     element.style['padding-left'] = 15 + 'px';
                 };
-            },
-            link: function (scope, element, attrs, ngModelCtrl) {
-                scope.optionsParent = $($(element).children()[0]).children()[1];
+                $scope.growTransitionReset = function(element) {
+                    element.style['padding-left'] = 0;
+                };
             },
         };
     }
