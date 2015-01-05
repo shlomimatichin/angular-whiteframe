@@ -157,14 +157,14 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '        Click me!' +
                 '    </div>' +
                 '</div></div>',
-            link: function (scope, element, attrs, ngModelCtrl) {
-                if (!scope.zheight)
-                    scope.zheight = 1;
-                if (!scope.heightMultiplier)
-                    scope.heightMultiplier = 5;
-                scope.showingLabel = "";
-                if (scope.selected)
-                    scope.showingLabel = scope.selected.label;
+            controller: function($scope, $element) {
+                if (!$scope.zheight)
+                    $scope.zheight = 1;
+                if (!$scope.heightMultiplier)
+                    $scope.heightMultiplier = 5;
+                $scope.showingLabel = "";
+                if ($scope.selected)
+                    $scope.showingLabel = $scope.selected.label;
             },
         };
     }
