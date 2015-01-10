@@ -140,6 +140,7 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 heightMultiplier: "@whiteframeHeightMultiplier",
                 options: "=whiteframeMenuOptions",
                 selected: "=whiteframeMenuSelected",
+                placeholder: "@placeholder",
             },
             template:
                 '<div>' +
@@ -152,12 +153,12 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
                 '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
                 '        ng-click="openMenu()">' +
-                '        <span ng-bind="showingLabel"></span>' +
-                '        <div style="position: relative; left:100%; top:-23px">' +
+                '        <div style="position: relative; width:0px; height: 0px; left:100%; top:4px">' +
                 '            <div style="position: relative; left:-16px;">' +
                 '                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M5 8l4 4 4-4z"/></svg>' +
                 '            </div>'+
                 '        </div>'+
+                '        <span ng-bind="showingLabel" ng-style="showingLabelStyle"></span>' +
                 '    </div>' +
                 '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" ng-click="closeWhiteframe()">' +
                 '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px; cursor:pointer; " ng-click="selectionMade(option)">' +
@@ -171,8 +172,13 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 if (!$scope.heightMultiplier)
                     $scope.heightMultiplier = 5;
                 $scope.showingLabel = "";
+                $scope.showingLabelStyle = {};
                 if ($scope.selected)
                     $scope.showingLabel = $scope.selected.label;
+                else {
+                    $scope.showingLabelStyle = {color: 'rgba(0,0,0, 0.372)'};
+                    $scope.showingLabel = $scope.placeholder;
+                }
                 $scope.openMenu = function() {
                     var optionIndex = -1;
                     for (var i in $scope.options)
@@ -185,6 +191,7 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 $scope.selectionMade = function(option) {
                     $scope.selected = option;
                     $scope.showingLabel = option.label;
+                    $scope.showingLabelStyle = {};
                     $scope.whiteframe.close();
                 };
                 $scope.growTransition = function(intervalDesc, element) {

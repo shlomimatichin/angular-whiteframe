@@ -36,8 +36,14 @@
             <div style="display: block; height:150px;">
             </div>
             <div>
+                Not selected<br/>
+                <menu-demo1></menu-demo1>
+            </div>
+            <div style="display: block; height:150px;">
+            </div>
+            <div>
                 Not first option selected<br/>
-                <menu-demo></menu-demo>
+                <menu-demo2></menu-demo2>
             </div>
         </div>
 
@@ -53,7 +59,19 @@
             {key: 8, label: "Option 8"},
         ];
         var app = angular.module('demoApp', ['whiteframe']);
-        app.directive("menuDemo", function() {
+        app.directive("menuDemo1", function() {
+            return {
+                restrict: "E",
+                template:
+                    '<whiteframe-menu whiteframe-menu-options="options" whiteframe-menu-selected="selected" style="width:200px" placeholder="An Option">' +
+                    '</whiteframe-menu>',
+                scope: {},
+                controller: function($scope, $element) {
+                    $scope.options = options;
+                },
+            };
+        });
+        app.directive("menuDemo2", function() {
             return {
                 restrict: "E",
                 template:
