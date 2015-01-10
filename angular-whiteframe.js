@@ -143,7 +143,7 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 placeholder: "@placeholder",
             },
             template:
-                '<div>' +
+                '<div class="whiteframe-menu">' +
                 '<div style="height: 50px; background-color: #fff; display:block;" ' +
                     'whiteframe-over whiteframe-zheight="{{zheight}}" ' +
                     'whiteframe-padding=15 ' +
@@ -158,10 +158,10 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M5 8l4 4 4-4z"/></svg>' +
                 '            </div>'+
                 '        </div>'+
-                '        <span ng-bind="showingLabel" ng-style="showingLabelStyle"></span>' +
+                '        <span class="whiteframe-menu-collapsed-label" ng-bind="showingLabel" ng-style="showingLabelStyle"></span>' +
                 '    </div>' +
                 '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" ng-click="closeWhiteframe()">' +
-                '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px; cursor:pointer; " ng-click="selectionMade(option)">' +
+                '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px; cursor:pointer; " ng-click="selectionMade(option)" class="whiteframe-menu-option">' +
                 '            <span ng-bind="option.label"></span>' +
                 '        </div>' +
                 '    </div>' +
