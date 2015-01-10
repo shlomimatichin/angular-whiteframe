@@ -45,6 +45,12 @@
                 Not first option selected<br/>
                 <menu-demo2></menu-demo2>
             </div>
+            <div style="display: block; height:150px;">
+            </div>
+            <div>
+                single option<br/>
+                <menu-demo3></menu-demo3>
+            </div>
         </div>
 
     <script>
@@ -81,6 +87,18 @@
                 controller: function($scope, $element) {
                     $scope.options = options;
                     $scope.selected = $scope.options[3];
+                },
+            };
+        });
+        app.directive("menuDemo3", function() {
+            return {
+                restrict: "E",
+                template:
+                    '<whiteframe-menu whiteframe-menu-options="options" whiteframe-menu-selected="selected" style="width:200px" placeholder="An Option">' +
+                    '</whiteframe-menu>',
+                scope: {},
+                controller: function($scope, $element) {
+                    $scope.options = [options[0]];
                 },
             };
         });
