@@ -27,7 +27,7 @@ var CSSTransitionEditor = function(previousValue) {
     }
     self.apply = function(element) {
         var serialized = self.serialize();
-        element.style['-os-transition'] = serialized;
+        element.style['-o-transition'] = serialized;
         element.style['-moz-transition'] = serialized;
         element.style['-webkit-transition'] = serialized;
         element.style.transition = serialized;
