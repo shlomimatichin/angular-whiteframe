@@ -60,72 +60,71 @@ var growCSSTransition = function(element, toWidth, toHeight, toLeft, toTop) {
     element.style.top = toTop + 'px';
 };
 
-app.directive('whiteframeOver', ['$compile', '$q', '$parse',
-    function ($compile, $q, $parse) {
-        'use strict';
+app.directive('whiteframeOver', [function() {
+    'use strict';
 
-        return {
-            restrict: 'A',
-            scope: {
-                depthText: "@whiteframeZheight",
-                paddingText: "@whiteframePadding",
-                heightMultiplierText: "@whiteframeHeightMultiplier",
-                growTransitionBegun: "=whiteframeGrowTransitionBegun",
-                growTransitionReset: "=whiteframeGrowTransitionReset",
-            },
-            link: function (scope, element, attrs, ngModelCtrl) {
-                scope.$parent.whiteframe = scope;
+    return {
+        restrict: 'A',
+        scope: {
+            depthText: "@whiteframeZheight",
+            paddingText: "@whiteframePadding",
+            heightMultiplierText: "@whiteframeHeightMultiplier",
+            growTransitionBegun: "=whiteframeGrowTransitionBegun",
+            growTransitionReset: "=whiteframeGrowTransitionReset",
+        },
+        link: function (scope, element, attrs, ngModelCtrl) {
+            scope.$parent.whiteframe = scope;
+            scope.isOpen = false;
+            scope.open = function(scrollTopOnOpen) {
+                scope.scrollTopOnOpen = scrollTopOnOpen;
+                scope.isOpen = true;
+            };
+            scope.close = function() {
                 scope.isOpen = false;
-                scope.open = function(scrollTopOnOpen) {
-                    scope.scrollTopOnOpen = scrollTopOnOpen;
-                    scope.isOpen = true;
-                };
-                scope.close = function() {
-                    scope.isOpen = false;
-                };
-                scope.depth = parseInt(scope.depthText);
-                scope.padding = parseInt(scope.paddingText);
-                scope.heightMultiplier = parseInt(scope.heightMultiplierText);
-                $(element).children().hide();
-                var closedRoot = $(element).children()[0];
-                var openedRoot = $(element).children()[1];
-                $(closedRoot).show();
-                scope.$watch('isOpen', function(value, prev) {
-                    if (value === prev)
-                        return;
-                    if (value === true) {
-                        var offset = $(closedRoot).offset();
-                        var width = $(closedRoot).width();
-                        var height = $(closedRoot).height();
-                        var zHeight = zHeights[scope.depth];
+            };
+            scope.depth = parseInt(scope.depthText);
+            scope.padding = parseInt(scope.paddingText);
+            scope.heightMultiplier = parseInt(scope.heightMultiplierText);
+            $(element).children().hide();
+            var closedRoot = $(element).children()[0];
+            var openedRoot = $(element).children()[1];
+            $(closedRoot).show();
+            scope.$watch('isOpen', function(value, prev) {
+                if (value === prev)
+                    return;
+                if (value === true) {
+                    var offset = $(closedRoot).offset();
+                    var width = $(closedRoot).width();
+                    var height = $(closedRoot).height();
+                    var zHeight = zHeights[scope.depth];
+                    $(openedRoot).show().offset(offset).width(width).height(height);
+                    openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + zHeight.boxShadowOpacity + ')';
+                    if (scope.scrollTopOnOpen !== undefined)
+                        openedRoot.scrollTop = scope.scrollTopOnOpen;
+                    $(openedRoot).hide().fadeIn(200, function() {
+                        growCSSTransition(openedRoot,
+                            width + 2*scope.padding,
+                            scope.heightMultiplier * height,
+                            -scope.padding,
+                            -(scope.heightMultiplier * height + 1) / 2);
+                        if (scope.growTransitionBegun)
+                            scope.growTransitionBegun('0.3s', openedRoot);
+                    });
+                } else {
+                    var offset = $(closedRoot).offset();
+                    var width = $(closedRoot).width();
+                    var height = $(closedRoot).height();
+                    $(openedRoot).fadeOut(200, function(){
                         $(openedRoot).show().offset(offset).width(width).height(height);
-                        openedRoot.style.boxShadow = zHeight.boxShadow + ' rgba(0,0,0,' + zHeight.boxShadowOpacity + ')';
-                        if (scope.scrollTopOnOpen !== undefined)
-                            openedRoot.scrollTop = scope.scrollTopOnOpen;
-                        $(openedRoot).hide().fadeIn(200, function() {
-                            growCSSTransition(openedRoot,
-                                width + 2*scope.padding,
-                                scope.heightMultiplier * height,
-                                -scope.padding,
-                                -(scope.heightMultiplier * height + 1) / 2);
-                            if (scope.growTransitionBegun)
-                                scope.growTransitionBegun('0.3s', openedRoot);
-                        });
-                    } else {
-                        var offset = $(closedRoot).offset();
-                        var width = $(closedRoot).width();
-                        var height = $(closedRoot).height();
-                        $(openedRoot).fadeOut(200, function(){
-                            $(openedRoot).show().offset(offset).width(width).height(height);
-                            if (scope.growTransitionReset)
-                                scope.growTransitionReset(openedRoot);
-                            $(openedRoot).hide();
-                        });
-                    }
-                });
-            }
+                        if (scope.growTransitionReset)
+                            scope.growTransitionReset(openedRoot);
+                        $(openedRoot).hide();
+                    });
+                }
+            });
         }
     }
+}
 ]);
 
 app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
@@ -152,13 +151,13 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                     'whiteframe-grow-transition-reset="growTransitionReset">' +
                 '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
                 '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
-                '        ng-click="openMenu()">' +
+                '        ng-click="openMenu()" class="whiteframe-menu-container">' +
                 '        <div style="position: relative; width:0px; height: 0px; left:100%; top:4px">' +
                 '            <div style="position: relative; left:-16px;">' +
                 '                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M5 8l4 4 4-4z"/></svg>' +
                 '            </div>'+
                 '        </div>'+
-                '        <span class="whiteframe-menu-collapsed-label" ng-bind="showingLabel" ng-style="showingLabelStyle"></span>' +
+                '        <span class="whiteframe-menu-collapsed-label" ng-class="{\'whiteframe-menu-collapsed-label-empty\': !selected}" ng-bind="showingLabel"></span>' +
                 '    </div>' +
                 '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" ng-click="closeWhiteframe()">' +
                 '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px; cursor:pointer; " ng-click="selectionMade(option)" class="whiteframe-menu-option">' +
@@ -172,13 +171,10 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 if (!$scope.heightMultiplier)
                     $scope.heightMultiplier = 5;
                 $scope.showingLabel = "";
-                $scope.showingLabelStyle = {};
                 if ($scope.selected)
                     $scope.showingLabel = $scope.selected.label;
-                else {
-                    $scope.showingLabelStyle = {color: 'rgba(0,0,0, 0.372)'};
+                else
                     $scope.showingLabel = $scope.placeholder;
-                }
                 $scope.openMenu = function() {
                     var optionIndex = -1;
                     for (var i in $scope.options)
@@ -191,7 +187,6 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 $scope.selectionMade = function(option) {
                     $scope.selected = option;
                     $scope.showingLabel = option.label;
-                    $scope.showingLabelStyle = {};
                     $scope.whiteframe.close();
                 };
                 $scope.growTransition = function(intervalDesc, element) {
