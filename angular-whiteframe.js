@@ -35,6 +35,22 @@ var CSSTransitionEditor = function(previousValue) {
 };
 
 (function() {
+    var css = '.whiteframe-menu > div { outline:0; }' +
+              '.whiteframe-menu > div:focus .whiteframe-menu-collapsed-label {' +
+              '  border-bottom-style: dashed; border-bottom-width: 1px; }';
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    if (style.styleSheet){
+        style.styleSheet.cssText = css;
+    } else {
+        style.appendChild(document.createTextNode(css));
+    }
+
+    head.appendChild(style);
+})();
+
+(function() {
 
 var app = angular.module('whiteframe', []);
 
@@ -148,7 +164,8 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                     'whiteframe-padding=15 ' +
                     'whiteframe-height-multiplier="{{heightMultiplier}}" ' +
                     'whiteframe-grow-transition-begun="growTransition" ' +
-                    'whiteframe-grow-transition-reset="growTransitionReset">' +
+                    'whiteframe-grow-transition-reset="growTransitionReset" ' +
+                '   tabindex="0" ng-blur="closeMenu()">' +
                 '    <div style="height: 30px; line-height:26px; border-style: solid; ' +
                 '        border-width: 0 0 1px 0; border-color: rgba(0,0,0,0.12)" ' +
                 '        ng-click="openMenu()" class="whiteframe-menu-container">' +
@@ -159,7 +176,7 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 '        </div>'+
                 '        <span class="whiteframe-menu-collapsed-label" ng-class="{\'whiteframe-menu-collapsed-label-empty\': !selected}" ng-bind="showingLabel"></span>' +
                 '    </div>' +
-                '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" ng-click="closeWhiteframe()">' +
+                '    <div style="line-height:26px; background-color:#fff; display:block; overflow-x: hidden; overflow-y: scroll" class="whiteframe-opened-menu">' +
                 '        <div ng-repeat="option in options" style="display:block; height:40px; line-height:36px; cursor:pointer; " ng-click="selectionMade(option)" class="whiteframe-menu-option">' +
                 '            <span ng-bind="option.label"></span>' +
                 '        </div>' +
@@ -183,6 +200,10 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                             break;
                         }
                     $scope.whiteframe.open(40 * optionIndex + 5);
+                    $element.children()[0].focus();
+                };
+                $scope.closeMenu = function() {
+                    $scope.whiteframe.close();
                 };
                 $scope.selectionMade = function(option) {
                     $scope.selected = option;
