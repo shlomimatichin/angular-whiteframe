@@ -188,10 +188,12 @@ app.directive('whiteframeMenu', ['$compile', '$q', '$parse',
                 if (!$scope.heightMultiplier)
                     $scope.heightMultiplier = 5;
                 $scope.showingLabel = "";
-                if ($scope.selected)
-                    $scope.showingLabel = $scope.selected.label;
-                else
-                    $scope.showingLabel = $scope.placeholder;
+                $scope.$watch('selected', function() {
+                    if ($scope.selected)
+                        $scope.showingLabel = $scope.selected.label;
+                    else
+                        $scope.showingLabel = $scope.placeholder;
+                });
                 $scope.openMenu = function() {
                     var optionIndex = -1;
                     for (var i in $scope.options)
